@@ -1,7 +1,4 @@
-Top ! Voici un **README complet** (mode d’emploi + caractéristiques techniques) prêt pour GitHub.
-Tu peux le coller tel quel dans `README.md`.
 
-````markdown
 # Cross scolaire – WebApp de gestion (HTML/JS/CSS)
 
 Application 100% locale pour gérer un **cross scolaire** : import des élèves, création de **courses au tour** ou **au temps**, génération de **dossards avec code-barres**, **scans** en direct, **classements** (individuel / par classe) et **impression** A4.
