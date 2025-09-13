@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Cross scolaire – Gestion</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script defer src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<header class="app-header">
+  <div class="header-left">
+    <h1>Cross scolaire – Gestion</h1>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="t1">1. Import élèves</button>
+      <button class="tab-btn" data-tab="t2">2. Paramétrages</button>
+      <button class="tab-btn" data-tab="t3">3. Dossards</button>
+      <button class="tab-btn" data-tab="t4">4. Course au tour</button>
+      <button class="tab-btn" data-tab="t5">5. Course au temps</button>
+      <button class="tab-btn" data-tab="t6">6. Résultats</button>
+    </nav>
+  </div>
+  <div class="header-right">
+    <button id="btnHelp" class="btn ghost">Aide</button>
+  </div>
+</header>
+
+<main>
+  <!-- Onglet 1 : Import / saisie élèves -->
+  <section id="t1" class="tab-panel active">
+    <div class="card">
+      <h2>Import CSV ou saisie manuelle</h2>
+      <p>Colonnes acceptées : <code>nom,prenom,classe,date_naissance,genre</code>. Les champs peuvent manquer, seul <b>nom</b> est requis.
+         Séparateur virgule ou point-virgule.</p>
+
+      <div class="grid-2">
+        <div>
+          <label class="label">Importer un CSV</label>
+          <input id="csvFile" type="file" accept=".csv" />
+          <button id="btnImportCsv" class="btn">Importer</button>
+        </div>
+
+        <div>
+          <label class="label">Ajouter un élève (manuel)</label>
+          <div class="row">
+            <input id="iNom" placeholder="Nom *"/>
+            <input id="iPrenom" placeholder="Prénom"/>
+          </div>
+          <div class="row">
+            <input id="iClasse" placeholder="Classe (ex. 5A)"/>
+            <input id="iNaissance" type="date" placeholder="Date de naissance"/>
+            <select id="iGenre">
+              <option value="">Genre</option>
+              <option value="F">F</option>
+              <option value="M">M</option>
+              <option value="X">X / Non précisé</option>
+            </select>
+          </div>
+          <button id="btnAddEleve" class="btn">Ajouter</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button id="btnClearEleves" class="btn danger">Effacer la base élèves</button>
+        <button id="btnResetAll" class="btn danger">Reset général (élèves + courses + résultats)</button>
+      </div>
+
+      <h3>Élèves</h3>
+      <div class="table-wrap">
+        <table id="tblEleves">
+          <thead><tr>
+            <th>#</th><th>Nom</th><th>Prénom</th><th>Classe</th><th>Naissance</th><th>Genre</th><th>Actions</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Onglet 2 : Paramétrages des courses -->
+  <section id="t2" class="tab-panel">
+    <div class="card">
+      <h2>Définir une course</h2>
+      <div class="grid-2">
+        <div>
+          <div class="row">
+            <input id="cNom" placeholder="Nom de la course *"/>
+          </div>
+          <div class="row">
+            <select id="cType">
+              <option value="laps">Course au tour (scan = 1 tour)</option>
+              <option value="time">Course au temps (ordre d’arrivée)</option>
+            </select>
+            <input id="cDate" type="date" />
+          </div>
+
+          <h4>Filtres de sélection</h4>
+          <div class="row">
+            <select id="fGenre">
+              <option value="">Tous genres</option>
+              <option value="F">F</option>
+              <option value="M">M</option>
+              <option value="X">X / Non précisé</option>
+            </select>
+            <input id="fClasses" placeholder="Classes (ex. 5A,5B)"/>
+          </div>
+          <div class="row">
+            <label class="label small">Âge min (au 31 déc) </label>
+            <input id="fAgeMin" type="number" min="0" step="1" placeholder="ex. 10"/>
+            <label class="label small">Âge max</label>
+            <input id="fAgeMax" type="number" min="0" step="1" placeholder="ex. 14"/>
+          </div>
+
+          <div class="row">
+            <button id="btnPreviewCourse" class="btn ghost">Prévisualiser la sélection</button>
+            <button id="btnCreateCourse" class="btn">Créer la course</button>
+          </div>
+        </div>
+
+        <div>
+          <h4>Aperçu participants (filtré)</h4>
+          <p><span id="previewCount">0</span> élève(s) correspond(ent)</p>
+          <div class="table-wrap small">
+            <table id="tblPreview">
+              <thead><tr><th>#</th><th>Nom</th><th>Prénom</th><th>Classe</th><th>Naissance</th><th>Genre</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3>Courses définies</h3>
+      <div class="table-wrap">
+        <table id="tblCourses">
+          <thead><tr>
+            <th>#</th><th>Nom</th><th>Type</th><th>Date</th><th>Filtres</th><th>Participants</th><th>Actions</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal édition course -->
+    <dialog id="editCourseDlg">
+      <form method="dialog" class="dlg">
+        <h3>Éditer la course</h3>
+        <div class="row"><input id="eNom" placeholder="Nom de la course *"/></div>
+        <div class="row">
+          <select id="eType">
+            <option value="laps">Course au tour</option>
+            <option value="time">Course au temps</option>
+          </select>
+          <input id="eDate" type="date"/>
+        </div>
+        <h4>Filtres</h4>
+        <div class="row">
+          <select id="eGenre">
+            <option value="">Tous genres</option>
+            <option value="F">F</option>
+            <option value="M">M</option>
+            <option value="X">X / Non précisé</option>
+          </select>
+          <input id="eClasses" placeholder="Classes (ex. 5A,5B)"/>
+        </div>
+        <div class="row">
+          <label class="label small">Âge min</label><input id="eAgeMin" type="number" min="0" step="1"/>
+          <label class="label small">Âge max</label><input id="eAgeMax" type="number" min="0" step="1"/>
+        </div>
+
+        <p class="muted">Attention : éditer une course <b>réécrit</b> la liste des participants et <b>efface</b> les résultats existants.</p>
+        <div class="row end">
+          <button value="cancel" class="btn ghost">Annuler</button>
+          <button id="btnSaveEdit" value="default" class="btn">Enregistrer</button>
+        </div>
+      </form>
+    </dialog>
+  </section>
+
+  <!-- Onglet 3 : Dossards (½ A4) -->
+  <section id="t3" class="tab-panel">
+    <div class="card">
+      <h2>Générer les dossards (½ A4)</h2>
+      <div class="row">
+        <select id="selCourseDossards"></select>
+        <input id="bibPrefix" placeholder="Préfixe (option, ex. C1-)"/>
+        <input id="bibStart" type="number" min="1" step="1" value="1" />
+        <input id="eventName" placeholder="Nom de l’évènement (option)"/>
+        <button id="btnMakeBibs" class="btn">Générer</button>
+        <button id="btnPrintBibs" class="btn ghost">Imprimer</button>
+      </div>
+      <p>Astuce douchette : le code-barres encode exactement le numéro de dossard.</p>
+      <div id="bibPreview" class="bib-preview"></div>
+    </div>
+  </section>
+
+  <!-- Onglet 4 : Course au tour -->
+  <section id="t4" class="tab-panel">
+    <div class="card">
+      <h2>Course au tour – Comptage par scan</h2>
+      <div class="row groups">
+        <div class="btn-group" id="g1Laps">
+          <select id="selCourseLaps"></select>
+          <button id="btnLoadLaps" class="btn">Charger</button>
+          <button id="btnResetLaps" class="btn ghost">Réinitialiser</button>
+        </div>
+        <div class="btn-group" id="g2Laps">
+          <button id="btnStartLaps" class="btn">Démarrer</button>
+          <button id="btnFinishLaps" class="btn danger">Fin</button>
+        </div>
+      </div>
+      <div class="scan-bar">
+        <div class="focus-dot" id="focusDot" title="État du focus"></div>
+        <input id="scanInput" placeholder="Scanner un dossard…" autocomplete="off"/>
+        <span class="hint">G1: Charger/Réinitialiser · G2: Démarrer/Fin</span>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h3>Classement individuel (live)</h3>
+          <div class="table-wrap">
+            <table id="tblLapsInd">
+              <thead><tr>
+                <th>Rang</th><th>Dossard</th><th>Nom</th><th>Classe</th><th>Tours</th><th>Dernier scan</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>Classement par classe (live)</h3>
+          <div class="table-wrap">
+            <table id="tblLapsClass">
+              <thead><tr><th>Rang</th><th>Classe</th><th>Tours cumulés</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Onglet 5 : Course au temps -->
+  <section id="t5" class="tab-panel">
+    <div class="card">
+      <h2>Course au temps – Ordre d’arrivée</h2>
+    <div class="row groups">
+        <div class="btn-group" id="g1Time">
+          <select id="selCourseTime"></select>
+          <button id="btnLoadTime" class="btn">Charger</button>
+          <button id="btnResetTime" class="btn ghost">Réinitialiser</button>
+        </div>
+        <div class="btn-group" id="g2Time">
+          <button id="btnStartTime" class="btn">Départ</button>
+          <button id="btnFinishTime" class="btn danger">Fin</button>
+        </div>
+      </div>
+
+      <div class="chrono-wrap">
+        <div id="timeChrono" class="chrono">00:00</div>
+      </div>
+
+      <div class="scan-bar">
+        <div class="focus-dot" id="focusDot2" title="État du focus"></div>
+        <input id="finishInput" placeholder="Scanner un dossard qui arrive…" autocomplete="off"/>
+        <span class="hint">G1: Charger/Réinitialiser · G2: Départ/Fin</span>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h3>Inscrits (encore en course)</h3>
+          <div class="table-wrap">
+            <table id="tblPending">
+              <thead><tr><th>#</th><th>Dossard</th><th>Nom</th><th>Classe</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <h3>Arrivées (live)</h3>
+          <div class="table-wrap">
+            <table id="tblFinish">
+              <thead><tr>
+                <th>Rang</th><th>Dossard</th><th>Nom</th><th>Classe</th><th>Temps</th><th>Horodatage</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Onglet 6 : Résultats -->
+  <section id="t6" class="tab-panel">
+    <div class="card">
+      <h2>Résultats et impression</h2>
+      <p>Sélectionnez une course, puis choisissez le type d’impression.</p>
+      <div class="row">
+        <select id="selCourseResults"></select>
+        <button id="btnPrintResults" class="btn ghost">Imprimer</button>
+        <button id="btnPrintLapsInd" class="btn ghost" style="display:none;">Imprimer individuel</button>
+        <button id="btnPrintLapsClass" class="btn ghost" style="display:none;">Imprimer par classe</button>
+      </div>
+      <div id="resultsWrap"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="app-footer">
+   <p style="color: grey ; text-align:center ; font-size: 12px"> Copyright &copy; 2022-<script>document.write(new Date().getFullYear())</script> Webjéjé - Licence Creative Commons</p>
+</footer>
+
+<!-- Aide -->
+<dialog id="helpDlg">
+  <form method="dialog" class="dlg dlg-help">
+    <h3>Mode d’emploi – Cross scolaire</h3>
+    <div class="help-body">
+      <h4>Principe général</h4>
+      <ul>
+        <li>Données <b>locales</b> (navigateur), aucune synchronisation ni traqueur.</li>
+        <li>Scanner code-barres = saisie <b>instantanée</b> du numéro de dossard.</li>
+        <li>Thème écran <b>dark</b> lisible ; impression en <b>fond blanc/texte noir</b>.</li>
+      </ul>
+
+      <h4>1. Import élèves</h4>
+      <ul>
+        <li>CSV avec colonnes : <code>nom,prenom,classe,date_naissance,genre</code>. Seul <b>nom</b> est requis. Séparateur virgule ou point-virgule.</li>
+        <li>Ajout manuel possible. <b>Reset général</b> supprime élèves, courses et résultats.</li>
+      </ul>
+
+      <h4>2. Paramétrages</h4>
+      <ul>
+        <li>Créez une course : type <b>Tours</b> (comptage par scan) ou <b>Temps</b> (ordre d’arrivée).</li>
+        <li>Filtres : <b>genre</b>, <b>classes</b>, <b>âge min/max</b>. L’âge est calculé au <b>31/12</b> de l’année de la date si renseignée (sinon année courante).</li>
+        <li>Vous pouvez <b>éditer</b> une course : cela <b>réécrit</b> les participants et <b>efface</b> ses résultats.</li>
+      </ul>
+
+      <h4>3. Dossards</h4>
+      <ul>
+        <li>Attribuez les dossards avec un <b>préfixe</b> optionnel et un <b>numéro de départ</b>.</li>
+        <li>Le code-barres encode <b>exactement</b> le numéro de dossard. Impression au format <b>½ A4</b>, deux par page.</li>
+      </ul>
+
+      <h4>4. Course au tour</h4>
+      <ol>
+        <li><b>Choisir </b> la course (type Tours) puis <b>Charger</b>. La liste des participants s’affiche.</li>
+        <li><b>Démarrer</b> active le focus “scanner” (le focus se met en pause si vous ouvrez une liste). Chaque scan = +1 tour.</li>
+        <li><b>Fin</b> arrête la course, relâche le focus. <b>Réinitialiser</b> supprime les résultats de cette course.</li>
+      </ol>
+
+      <h4>5. Course au temps</h4>
+      <ol>
+        <li><b>Choisir </b> la course (type Temps) puis <b>Charger</b>. La liste des inscrits apparaît (colonne <i>Inscrits</i>).</li>
+        <li><b>Départ</b> lance le chrono <b>mm:ss</b> et active le focus “arrivées”.</li>
+        <li>À chaque scan d’un dossard, le coureur est retiré de <i>Inscrits</i> et ajouté aux <i>Arrivées</i> avec son temps. Un dossard ne peut arriver qu’une fois.</li>
+        <li><b>Fin</b> arrête la saisie et relâche le focus. <b>Réinitialiser</b> efface les arrivées et remet le chrono à zéro.</li>
+      </ol>
+
+      <h4>6. Résultats</h4>
+      <ul>
+        <li>À l’écran : thème <b>dark</b> (texte clair). À l’impression : <b>fond blanc, texte noir</b>.</li>
+        <li>Courses au tour : impression <b>individuelle</b> et <b>par classe</b>. Course au temps : impression standard.</li>
+      </ul>
+
+      <h4>Dépannage</h4>
+      <ul>
+        <li>La liste de courses ne s’ouvre pas ? Le focus “scanner” se <b>met en pause</b> automatiquement lorsque vous ouvrez une liste. Sinon cliquez <b>Fin</b>.</li>
+        <li>Impression sombre ? La feuille passe <b>forcément</b> en noir sur blanc.</li>
+      </ul>
+    </div>
+    <div class="row end">
+      <button class="btn" value="default">Fermer</button>
+    </div>
+  </form>
+</dialog>
+</body>
+</html>

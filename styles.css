@@ -1,0 +1,172 @@
+:root{
+  --bg:#0f172a;
+  --card:#111827;
+  --muted:#94a3b8;
+  --text:#e5e7eb;
+  --acc:#22c55e;
+  --danger:#ef4444;
+  --ghost:#1f2937;
+  --border:#334155;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  background:linear-gradient(180deg,#0b1324,#0f172a 30%,#0b1324);
+  color:var(--text);
+}
+
+/* Header avec bouton Aide à droite */
+.app-header{
+  padding:1rem; border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-end; justify-content:space-between; gap:1rem;
+}
+.header-left{min-width:0}
+.header-right{flex:0 0 auto}
+.app-header h1{margin:0 0 .5rem 0; font-size:1.25rem}
+
+.tabs{display:flex; gap:.5rem; flex-wrap:wrap}
+.tab-btn{
+  background:var(--ghost); color:var(--text);
+  border:1px solid var(--border); border-radius:.5rem;
+  padding:.5rem .75rem; cursor:pointer
+}
+.tab-btn.active{outline:2px solid var(--acc); border-color:var(--acc)}
+main{padding:1rem; max-width:1200px; margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:1rem;
+  padding:1rem;
+  box-shadow:0 10px 20px rgba(0,0,0,.25);
+}
+h2{margin:.25rem 0 1rem}
+h3,h4{margin:1rem 0 .5rem}
+.label{display:block; margin:.25rem 0 .25rem}
+.label.small{font-size:.85rem; color:var(--muted)}
+
+.row{display:flex; gap:.5rem; margin:.25rem 0 .5rem}
+.row input,.row select{flex:1; min-width:0}
+.row.end{justify-content:flex-end}
+.row.groups{align-items:stretch; gap:1rem}
+
+.btn-group{display:flex; gap:.5rem; align-items:center; background:#0b1222; padding:.5rem; border:1px solid var(--border); border-radius:.6rem}
+.btn-group[aria-disabled="true"]{opacity:.6; pointer-events:none}
+
+input,select,button{font:inherit; color:inherit}
+input,select{
+  background:#0b1222; border:1px solid var(--border); border-radius:.5rem; padding:.5rem .6rem;
+}
+input::placeholder{color:#6b7280}
+.btn{
+  background:var(--acc); border:none; color:#04110a;
+  padding:.55rem .9rem; border-radius:.6rem; cursor:pointer; font-weight:600
+}
+.btn.ghost{background:var(--ghost); color:var(--text); border:1px solid var(--border)}
+.btn.danger{background:var(--danger); color:#fff}
+.toolbar{display:flex; gap:.5rem; margin:.75rem 0}
+
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:1rem}
+@media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+
+.table-wrap{overflow:auto; border:1px solid var(--border); border-radius:.5rem}
+.table-wrap.small{max-height:300px}
+table{width:100%; border-collapse:collapse}
+th,td{border-bottom:1px solid var(--border); padding:.45rem .5rem; text-align:left}
+thead th{position:sticky; top:0; background:#0b1222}
+
+.mt-s{margin-top:.5rem}
+.codeblock{
+  background:#0b1222; border:1px dashed var(--border); padding:.5rem; border-radius:.5rem; color:#b8c1d1; overflow:auto
+}
+.muted{color:var(--muted)}
+
+/* Scan bar */
+.scan-bar{
+  display:flex; align-items:center; gap:.6rem; margin:.75rem 0;
+  background:#0b1222; border:1px solid var(--border); padding:.5rem; border-radius:.6rem
+}
+.focus-dot{width:10px; height:10px; border-radius:50%; background:#ef4444; flex:0 0 auto}
+.scan-bar input{flex:1}
+.hint{color:var(--muted); font-size:.9rem}
+
+/* Chrono */
+.chrono-wrap{display:flex; justify-content:center; margin:.5rem 0 .25rem}
+.chrono{
+  font-variant-numeric: tabular-nums;
+  font-size:2rem; font-weight:800; letter-spacing:.03em;
+  padding:.2rem .6rem; border:1px solid var(--border); border-radius:.5rem; background:#0b1222;
+}
+
+/* Dossards preview (écran) */
+.bib-preview{display:grid; grid-template-columns:1fr; gap:1rem; margin-top:1rem}
+.bib-card{background:#fff; color:#000; border-radius:.5rem; padding:1rem; border:1px solid #e5e7eb}
+.bib-head{display:flex; justify-content:space-between; align-items:center; font-weight:700}
+.bib-number{font-size:3.2rem; font-weight:900; text-align:center; margin:.5rem 0}
+.bib-meta{display:flex; justify-content:space-between; color:#111; font-size:1rem}
+.bib-meta small{color:#333}
+.bib-barcode{margin-top:.5rem}
+
+/* Résultats (écran = texte clair, impression = inversé) */
+.printable{color:var(--text)}
+.printable .table-wrap{border-color:var(--border)}
+.printable table th, .printable table td{color:var(--text); border-color:var(--border)}
+.printable h3{margin:.25rem 0}
+
+/* Dialog (édition & aide) */
+dialog::backdrop{
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,.45);
+}
+dialog{
+  border:1px solid var(--border); background:var(--card); color:var(--text);
+  border-radius:.75rem; padding:1rem; max-width:720px; width:clamp(300px,92vw,720px)
+}
+.dlg h3{margin:.25rem 0 .5rem}
+/* champs clairs dans le modal d’édition */
+.dlg input,.dlg select,.dlg textarea{
+  background:#ffffff !important; color:#111 !important; border:1px solid #e5e7eb !important;
+}
+.dlg input::placeholder{color:#6b7280}
+/* modal aide */
+.dlg-help .help-body{
+  max-height: min(65vh, 600px);
+  overflow:auto;
+  padding-right:.25rem;
+}
+
+/* Impression : forcer fond blanc / texte noir partout */
+@media print {
+  @page { size: A4 portrait; margin: 10mm; }
+  *{ 
+    background:#fff !important; 
+    color:#000 !important; 
+    box-shadow:none !important; 
+    text-shadow:none !important;
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact;
+  }
+  body{background:#fff !important}
+  header,nav,footer,.scan-bar,.toolbar,.row.groups,.hint,.chrono-wrap{display:none !important}
+  .card{border:none; box-shadow:none; padding:0}
+
+  /* Dossards : 2 par page ½ A4 */
+  #bibPreview{display:block}
+  .bib-card{
+    page-break-inside:avoid;
+    width: 187mm;
+    height: 133.5mm;
+    margin: 0 auto 10mm auto;
+    border:2px solid #000; border-radius:0;
+  }
+  .bib-number{font-size:90pt !important}
+
+  /* Résultats (impression) */
+  .printable .table-wrap{border:none}
+  .printable table th, .printable table td{border-color:#ddd !important; color:#000 !important}
+}
