@@ -272,15 +272,3 @@ type Course = {
 * Issues & PR bienvenues (bugs, accessibilité, compatibilité matériels).
 * Idées futures : export PDF/CSV des résultats, classements multi-critères, service worker (PWA), multi-postes (WebRTC).
 
----
-
-## 📄 Licence
-
-À définir par l’auteur du dépôt (recommandation : **MIT**).
-
----
-
-```
-
-Si tu veux, je peux aussi te générer un **badge de release** + un **CHANGELOG** minimal pour le dépôt.
-```
