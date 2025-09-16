@@ -4,6 +4,9 @@
 Application 100% locale pour gérer un **cross scolaire** : import des élèves, création de **courses au tour** ou **au temps**, génération de **dossards avec code-barres**, **scans** en direct, **classements** (individuel / par classe) et **impression** A4.
 
 - Démo : https://www.webjeje.com/online/webapp/cross/
+
+- Fichier d'import d'une liste d'élèves en démo pour faire des tests : https://www.webjeje.com/online/webapp/cross/listedemo.csv
+- Moulinette pronote : charger les exports de classe de pronote -> conversion en fichier csv compatible avec les bases cross. https://www.webjeje.com/online/webapp/cross/moulinettepronote.html
 - Stack : **Vanilla HTML/CSS/JS**, aucune dépendance build, 1 lib CDN (JsBarcode).
 - Données : **localStorage** (local-first, pas de serveur).
 
