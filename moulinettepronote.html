@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cross pronote</title>
+  <style>
+    /* ================================
+       Design refresh – 2025-09-13
+       AUCUNE LOGIQUE MODIFIÉE
+       ================================ */
+
+    :root{
+      /* Palette réhaussée, contrastée et accessible */
+      --bg:        #0b1020;   /* fond global */
+      --bg-2:      #0f172a;   /* calque */
+      --card:      #101826;   /* cartes */
+      --card-2:    #0c1322;   /* cartes profondes */
+      --muted:     #9ca3af;   /* texte atténué */
+      --text:      #e6e9ee;   /* texte principal */
+      --subtle:    #cbd5e1;   /* texte secondaire */
+      --accent:    #22c55e;   /* vert */
+      --accent-2:  #3b82f6;   /* bleu */
+      --accent-3:  #a78bfa;   /* violet */
+      --danger:    #ef4444;   /* rouge */
+      --ring:      rgba(59,130,246,.35);
+      --border:    #1f2a3a;   /* bordures */
+      --border-2:  #263247;   /* bordures survol */
+      --shadow:    0 10px 30px rgba(0,0,0,.35);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+    }
+
+    *{ box-sizing:border-box }
+
+    html,body{ height:100% }
+
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(1000px 700px at 100% 0%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg-2) 40%, var(--bg));
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* ---------------- Header ---------------- */
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px) saturate(120%);
+      background: linear-gradient(180deg, rgba(16,24,38,.72), rgba(16,24,38,.52));
+      border-bottom:1px solid var(--border);
+      padding:14px 20px;
+      display:flex; align-items:center; gap:12px; justify-content:space-between;
+    }
+    h1{ font-size: clamp(18px, 2.4vw, 26px); margin:0; letter-spacing:.2px; font-weight:700 }
+    .right{ display:flex; gap:12px; align-items:center }
+
+    /* ---------------- Layout ---------------- */
+    .wrap{ max-width:1100px; margin:28px auto; padding:0 16px }
+    .grid{ display:grid; grid-template-columns:1fr; gap:16px }
+    @media(min-width:1000px){ .grid{ grid-template-columns: 1fr 1fr } }
+
+    /* ---------------- Cards ---------------- */
+    .card{
+      background: linear-gradient(180deg, var(--card), var(--card-2));
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:16px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ---------------- Formes ---------------- */
+    label{ font-size:13px; color:var(--muted); display:block; margin-bottom:6px }
+
+    input[type="text"], input[type="file"], textarea, select{
+      width:100%; padding:11px 12px; border-radius:var(--radius-md);
+      border:1px solid var(--border);
+      background:#0b1220; color:var(--text); outline:none; transition:box-shadow .2s, border-color .2s, background .2s;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus{
+      border-color: var(--accent-2); box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    /* Bouton de sélection de fichier customisé */
+    input[type="file"]::-webkit-file-upload-button{ 
+      appearance: none; border:0; margin-right:10px; border-radius:10px; padding:9px 12px; font-weight:600; cursor:pointer;
+      background: linear-gradient(180deg, #1d4ed8, #1e40af); color:#fff;
+    }
+    input[type="file"]::file-selector-button{
+      border:0; margin-right:10px; border-radius:10px; padding:9px 12px; font-weight:600; cursor:pointer;
+      background: linear-gradient(180deg, #1d4ed8, #1e40af); color:#fff;
+    }
+
+    textarea.mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:13px; line-height:1.45 }
+
+    .row{ display:flex; gap:10px; align-items:end; flex-wrap:wrap }
+    .row > *{ flex:1 }
+
+    /* ---------------- Buttons ---------------- */
+    button{
+      border:0; color:white; padding:10px 14px; border-radius:var(--radius-md);
+      cursor:pointer; font-weight:700; letter-spacing:.2px;
+      background: linear-gradient(180deg, #2563eb, #1d4ed8);
+      box-shadow: 0 8px 18px rgba(37,99,235,.3), inset 0 1px 0 rgba(255,255,255,.05);
+      transition: transform .12s ease, box-shadow .2s ease, filter .15s ease;
+    }
+    button:hover{ transform: translateY(-1px); box-shadow: 0 12px 22px rgba(37,99,235,.35) }
+    button:active{ transform: translateY(0) }
+    button:focus-visible{ outline:3px solid var(--ring) }
+    button.secondary{ background: linear-gradient(180deg, #334155, #283748); box-shadow: 0 6px 14px rgba(15,23,42,.35) }
+    button.success{ background: linear-gradient(180deg, #22c55e, #16a34a); box-shadow: 0 8px 18px rgba(34,197,94,.28) }
+    button.danger{ background: linear-gradient(180deg, #ef4444, #dc2626); box-shadow: 0 8px 18px rgba(239,68,68,.28) }
+
+    /* ---------------- Segmented control ---------------- */
+    .seg{ display:inline-grid; grid-auto-flow:column; gap:0; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#0b1220 }
+    .seg input{ display:none }
+    .seg label{ padding:8px 12px; cursor:pointer; font-size:12px; color:var(--subtle); background:transparent; user-select:none; transition: background .15s, color .15s }
+    .seg input:checked + label{ background:#1a2436; color:#fff }
+    .seg label:hover{ background:#152032 }
+
+    /* ---------------- Badges & Pills ---------------- */
+    .pill{ display:inline-flex; gap:8px; align-items:center; font-size:12px; padding:7px 10px; border:1px solid var(--border); border-radius:999px; color:var(--subtle); background:#0c1322 }
+    .badge{ font-size:12px; background:#0b1220; border:1px solid var(--border); padding:5px 9px; border-radius:999px; color:var(--subtle) }
+
+    /* ---------------- Tables ---------------- */
+    .tbl-wrap{ max-height:300px; overflow:auto; border:1px solid var(--border); border-radius:12px; background:linear-gradient(180deg, #0d1526, #0c1424) }
+    table{ width:100%; border-collapse: collapse; font-size:14px; }
+    thead th{ position:sticky; top:0; background:linear-gradient(180deg,#0b1220,#0c1424); border-bottom:1px solid var(--border); box-shadow: 0 4px 8px rgba(0,0,0,.2) }
+    th, td{ border-bottom:1px solid var(--border); padding:10px 12px; text-align:left; }
+    tbody tr{ transition: background .12s }
+    tbody tr:nth-child(odd){ background: rgba(255,255,255,.02) }
+    tbody tr:hover{ background: rgba(59,130,246,.08) }
+
+    .num{ color:var(--subtle); font-variant-numeric: tabular-nums }
+    .tiny{ font-size:12px; color:var(--muted); margin-top:6px }
+    .actions{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-top:10px }
+
+    /* ---------------- Utilities ---------------- */
+    .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace }
+    .invis{ display:none !important }
+
+    /* Scrollbars (WebKit + Firefox) */
+    *{ scrollbar-width: thin; scrollbar-color: #334155 transparent }
+    ::-webkit-scrollbar{ height:10px; width:10px }
+    ::-webkit-scrollbar-thumb{ background:#334155; border-radius:10px }
+    ::-webkit-scrollbar-track{ background: transparent }
+
+    /* Focus visibles */
+    :focus-visible{ outline:3px solid var(--ring); outline-offset:2px; border-radius:10px }
+
+    /* Petites améliorations responsive */
+    @media(max-width:560px){
+      .right{ gap:8px }
+      .seg label{ padding:7px 10px }
+      button{ width:100% }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>cross pronote</h1>
+    <div class="right">
+      <span id="status" class="pill">0 fichier</span>
+      <div class="seg" role="radiogroup" aria-label="Fin de ligne">
+        <input type="radio" id="os-win" name="os" value="win">
+        <label for="os-win">Windows</label>
+        <input type="radio" id="os-unix" name="os" value="unix">
+        <label for="os-unix">macOS / Linux</label>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="card">
+      <div class="row">
+        <div>
+          <label for="file">Ajouter des fichiers export (.csv)</label>
+          <input id="file" type="file" accept=".csv,text/csv" multiple>
+        </div>
+        <div style="flex:0 0 auto; display:flex; align-items:flex-end; gap:8px">
+          <button id="btnClear" class="secondary">Vider la liste</button>
+        </div>
+      </div>
+      <div class="tbl-wrap" id="filesWrap" style="margin-top:10px; display:none">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Fichier</th>
+              <th>Lignes</th>
+              <th>Classe</th>
+              <th style="width:90px">Action</th>
+            </tr>
+          </thead>
+          <tbody id="filesBody"></tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <button id="btnGenerate" class="success">Générer la liste fusionnée</button>
+      </div>
+      <div id="outBox" class="invis">
+        <textarea id="output" rows="12" class="mono" readonly></textarea>
+        <div class="actions">
+          <button id="btnCopy" class="secondary">Copier</button>
+          <button id="btnDownload">Télécharger “liste cross.csv”</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div style="display:flex; gap:12px; align-items:center">
+        <span class="badge" id="rowsCount">0 lignes combinées</span>
+        <span class="badge" id="filesCount">0 fichiers</span>
+      </div>
+      <div class="tbl-wrap" style="margin-top:10px">
+        <table id="preview"></table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const statusPill = $('#status');
+    const fileInput = $('#file');
+    const btnClear = $('#btnClear');
+    const filesWrap = $('#filesWrap');
+    const filesBody = $('#filesBody');
+    const btnGenerate = $('#btnGenerate');
+    const outBox = $('#outBox');
+    const outArea = $('#output');
+    const btnCopy = $('#btnCopy');
+    const btnDownload = $('#btnDownload');
+    const rowsCount = $('#rowsCount');
+    const filesCount = $('#filesCount');
+    const previewTable = $('#preview');
+    const osWin = $('#os-win');
+    const osUnix = $('#os-unix');
+
+    function detectOS(){
+      const plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+      const ua = navigator.userAgent || '';
+      if(/Win/i.test(plat) || /Windows/i.test(ua)) return 'win';
+      if(/Mac/i.test(plat) || /Macintosh|Mac OS/i.test(ua)) return 'unix';
+      if(/Linux|X11|CrOS|Android|iPhone|iPad/i.test(plat+ua)) return 'unix';
+      return 'unix';
+    }
+    const defOS = detectOS();
+    if(defOS==='win') osWin.checked = true; else osUnix.checked = true;
+
+    // State
+    let buckets = []; // {id, name, size, rows: [r...], classVal: '', delimiter}
+    let counter = 1;
+
+    function updateStatus(){
+      statusPill.textContent = (buckets.length || 0) + (buckets.length<=1 ? ' fichier' : ' fichiers');
+      filesCount.textContent = (buckets.length||0) + ' fichiers';
+      filesWrap.style.display = buckets.length ? 'block' : 'none';
+      renderFilesTable();
+    }
+
+    function detectDelimiter(text){
+      const firstLine = text.split(/[\r\n]+/)[0] || '';
+      const cand = [',',';','\t','|'];
+      let best = ',', bestScore = -1;
+      for(const d of cand){
+        const cnt = firstLine.split(d).length - 1;
+        if(cnt > bestScore){ bestScore = cnt; best = d; }
+      }
+      return best;
+    }
+
+    function parseCSV(text, delimiter){
+      const rows = [];
+      let i=0, field='', row=[], inQuotes=false;
+      const pushField = () => { row.push(field); field=''; };
+      const pushRow = () => { rows.push(row); row=[]; };
+      while(i < text.length){
+        const ch = text[i];
+        if(inQuotes){
+          if(ch === '"'){
+            if(text[i+1] === '"'){ field += '"'; i+=2; continue; }
+            inQuotes = false; i++; continue;
+          } else { field += ch; i++; continue; }
+        } else {
+          if(ch === '"'){ inQuotes = true; i++; continue; }
+          if(ch === delimiter){ pushField(); i++; continue; }
+          if(ch === '\n'){ pushField(); pushRow(); i++; continue; }
+          if(ch === '\r'){
+            if(text[i+1] === '\n'){ pushField(); pushRow(); i+=2; continue; }
+            pushField(); pushRow(); i++; continue;
+          }
+          field += ch; i++; continue;
+        }
+      }
+      pushField();
+      if(row.length > 1 || (row.length===1 && row[0].trim()!=='')){ pushRow(); }
+      return rows;
+    }
+
+    function stripAccents(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+    function looksLikeHeader(row){
+      if(!row || row.length < 4) return false;
+      const a = (row[0]||'').toLowerCase();
+      const c = (row[2]||'').toLowerCase();
+      const d = stripAccents((row[3]||'').toLowerCase());
+      return a.includes('nom') && a.includes('prenom') || c.includes('date') || d.includes('feminin') || d.includes('masculin');
+    }
+    function isGarbage(row){
+      const c1 = (row[0]||'').trim();
+      if(!c1) return true;
+      if(/ne\\(e\\) le|nee le/i.test(row[3]||'')) return true;
+      return false;
+    }
+    function normalizeGender(g){
+      if(!g) return '';
+      const t = stripAccents(String(g).trim()).toLowerCase();
+      if(t === 'f' || t.startsWith('fem') || t.startsWith('fille') || t.startsWith('feminin')) return 'F';
+      if(t === 'm' || t.startsWith('masc') || t.startsWith('garc') || t.startsWith('male')) return 'M';
+      if(t.startsWith('f')) return 'F';
+      if(t.startsWith('m')) return 'M';
+      return '';
+    }
+    function splitName(fullname){
+      let s = String(fullname||'').trim().replace(/\\s+/g,' ');
+      if(!s) return {nom:'', prenom:''};
+      if(s.includes(',')){
+        const [a,b] = s.split(',').map(x=>x.trim());
+        return {nom:a||'', prenom:b||''};
+      }
+      const idx = s.lastIndexOf(' ');
+      if(idx === -1) return {nom:s, prenom:''};
+      const nom = s.slice(0, idx).trim();
+      const prenom = s.slice(idx+1).trim();
+      return {nom, prenom};
+    }
+    function toCSV(rows, delimiter=',', eol='\\n'){
+      const esc = v => {
+        if(v == null) v='';
+        v = String(v);
+        const mustQuote = v.includes(delimiter) || v.includes('"') || v.includes('\n') || v.includes('\r');
+        if(mustQuote) return '"' + v.replace(/"/g,'""') + '"';
+        return v;
+      };
+      return rows.map(r => r.map(esc).join(delimiter)).join(eol);
+    }
+
+    function renderFilesTable(){
+      filesBody.innerHTML = '';
+      buckets.forEach((b,idx)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="num">${idx+1}</td>
+          <td>${b.name}</td>
+          <td>${b.rows.length}</td>
+          <td><input type="text" data-id="${b.id}" class="cls" placeholder="ex : 5A" value="${b.classVal||''}" style="width:120px"></td>
+          <td><button class="danger" data-del="${b.id}">Supprimer</button></td>`;
+        filesBody.appendChild(tr);
+      });
+      filesBody.querySelectorAll('input.cls').forEach(inp=>{
+        inp.addEventListener('input', (e)=>{
+          const id = e.target.getAttribute('data-id');
+          const b = buckets.find(x=>x.id===id); if(b){ b.classVal = e.target.value.trim(); }
+        });
+      });
+      filesBody.querySelectorAll('button[data-del]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const id = e.target.getAttribute('data-del');
+          buckets = buckets.filter(x=>x.id !== id);
+          updateStatus();
+          renderCombinedPreview();
+        });
+      });
+    }
+
+    function renderCombinedPreview(){
+      const headers = ['nom','prenom','classe','date_naissance','genre'];
+      const rows = [];
+      let added = 0;
+      for(const b of buckets){
+        const cls = b.classVal || '';
+        for(const r of b.rows){
+          const {nom, prenom} = splitName(r[0] ?? '');
+          const date = r[2] ?? '';
+          const genre = normalizeGender(r[3] ?? '');
+          rows.push([nom, prenom, cls, date, genre]);
+          added++;
+          if(added >= 10) break;
+        }
+        if(added >= 10) break;
+      }
+      previewTable.innerHTML = '';
+      const thead = document.createElement('thead');
+      const trh = document.createElement('tr');
+      headers.forEach(h=>{ const th=document.createElement('th'); th.textContent=h; trh.appendChild(th); });
+      thead.appendChild(trh);
+      const tbody = document.createElement('tbody');
+      rows.forEach(r=>{
+        const tr = document.createElement('tr');
+        r.forEach(c=>{ const td=document.createElement('td'); td.textContent = c ?? ''; tr.appendChild(td); });
+        tbody.appendChild(tr);
+      });
+      previewTable.appendChild(thead); previewTable.appendChild(tbody);
+
+      const total = buckets.reduce((acc,b)=> acc + b.rows.length, 0);
+      rowsCount.textContent = total + ' lignes combinées';
+    }
+
+    async function readAsText(file){
+      const buf = await file.arrayBuffer();
+      try{ return new TextDecoder('utf-8', {fatal:true}).decode(buf); }
+      catch(e){ return new TextDecoder('iso-8859-1').decode(buf); }
+    }
+
+    fileInput.addEventListener('change', async (e)=>{
+      const list = Array.from(e.target.files||[]);
+      if(!list.length) return;
+      for(const f of list){
+        const text = await readAsText(f);
+        const delimiter = detectDelimiter(text);
+        let rows = parseCSV(text, delimiter).filter(r => r.length && r.some(x => String(x).trim()!==''));
+        if(rows.length && looksLikeHeader(rows[0])) rows = rows.slice(1);
+        rows = rows.filter(r => r[0] && r[0].trim()!=='');
+        buckets.push({ id: String(counter++), name: f.name, size: f.size, rows, classVal: '', delimiter });
+      }
+      e.target.value = '';
+      updateStatus();
+      renderCombinedPreview();
+      outBox.classList.add('invis');
+    });
+
+    btnClear.addEventListener('click', ()=>{
+      buckets = [];
+      updateStatus();
+      renderCombinedPreview();
+      outBox.classList.add('invis');
+    });
+
+    btnGenerate.addEventListener('click', ()=>{
+      if(!buckets.length){ alert('Ajoutez au moins un fichier CSV.'); return; }
+      for(const b of buckets){
+        if(!b.classVal){ alert('Renseignez la classe pour chaque fichier.'); return; }
+      }
+      const out = [];
+      out.push(['nom','prenom','classe','date_naissance','genre']);
+      let total = 0;
+      for(const b of buckets){
+        for(const r of b.rows){
+          const {nom, prenom} = splitName(r[0] ?? '');
+          const date = r[2] ?? '';
+          const genre = normalizeGender(r[3] ?? '');
+          out.push([nom, prenom, b.classVal, date, genre]);
+          total++;
+        }
+      }
+      const eol = osWin.checked ? '\r\n' : '\n';
+      const csv = toCSV(out, ',', eol);
+      outArea.value = csv;
+      outBox.classList.remove('invis');
+      rowsCount.textContent = total + ' lignes combinées';
+      outArea.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+
+    btnCopy.addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(outArea.value);
+        btnCopy.textContent = 'Copié !'; setTimeout(()=>btnCopy.textContent='Copier', 1500);
+      }catch(e){ alert('Copie impossible. Sélectionnez le texte et utilisez Ctrl+C.'); }
+    });
+
+    btnDownload.addEventListener('click', ()=>{
+      const bom = '\ufeff';
+      const data = bom + outArea.value;
+      const blob = new Blob([data], {type:'text/csv;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'liste cross.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    });
+  </script>
+</body>
+</html>
